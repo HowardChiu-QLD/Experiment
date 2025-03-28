@@ -1,0 +1,21 @@
+import pyautogui
+import time
+
+# Definition
+MOVE_INTERVAL = 60  
+MOVE_DISTANCE = 10  
+
+def move_mouse_periodically():
+    print("Exp start...")
+    try:
+        while True:
+            current_x, current_y = pyautogui.position()
+            pyautogui.moveTo(current_x + MOVE_DISTANCE, current_y, duration=0.1)
+            time.sleep(0.1) 
+            pyautogui.moveTo(current_x, current_y, duration=0.1)
+            time.sleep(MOVE_INTERVAL)
+    except KeyboardInterrupt: # Ctrl+C for interruption
+        print("Stop")
+
+if __name__ == "__main__":
+    move_mouse_periodically()
