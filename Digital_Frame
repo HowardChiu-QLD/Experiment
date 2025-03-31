@@ -1,0 +1,43 @@
+import os
+import tkinter as tk
+from tkinter import Label
+from PIL import Image, ImageTk
+import time
+
+IMAGE_FOLDER = "path/to/your/images"  
+INTERVAL = 5000  
+
+class DigitalPhotoFrame:
+    def __init__(self, root, folder):
+        self.root = root
+        self.folder = folder
+        self.image_files = [f for f in os.listdir(folder) if f.lower().endswith(('png', 'jpg', 'jpeg', 'gif', 'bmp'))]
+        self.index = 0
+        
+        if not self.image_files:
+            print("No photo found")
+            return
+        
+        self.label = Label(root)
+        self.label.pack(fill=tk.BOTH, expand=True)
+        self.update_image()
+    
+    def update_image(self):
+        image_path = os.path.join(self.folder, self.image_files[self.index])
+        img = Image.open(image_path)
+        img = img.resize((800, 600), Image.ANTIALIAS)  # Adjust the size
+        photo = ImageTk.PhotoImage(img)
+        
+        self.label.config(image=photo)
+        self.label.image = photo
+        
+        self.index = (self.index + 1) % len(self.image_files)
+        self.root.after(INTERVAL, self.update_image)
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    root.title("Digital Frame")
+    root.geometry("800x600")
+    
+    frame = DigitalPhotoFrame(root, IMAGE_FOLDER)
+    root.mainloop()
