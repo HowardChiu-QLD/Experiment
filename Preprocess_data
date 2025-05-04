@@ -1,0 +1,58 @@
+import os
+import pandas as pd
+
+def add_csv_extension(folder_path):
+    """
+    將資料夾中所有檔案的副檔名加上 .csv
+
+    :param folder_path: 資料夾路徑
+    """
+    files = os.listdir(folder_path)
+    for file_name in files:
+        file_path = os.path.join(folder_path, file_name)
+        if os.path.isfile(file_path) and not file_name.endswith('.csv'):
+            new_file_path = f"{file_path}.csv"
+            os.rename(file_path, new_file_path)
+            print(f"Renamed: {file_path} -> {new_file_path}")
+
+def preprocess_files_for_power_bi(folder_path):
+    """
+    處理資料夾中的檔案，將其轉換為適用於 Power BI 的 CSV 格式。
+
+    :param folder_path: 資料夾路徑
+    """
+    # 固定寬度與欄位名稱的設定
+    widths = [10, 15, 20]  # 假設每一欄的寬度（自行調整）
+    columns = ["Column1", "Column2", "Column3"]  # 假設欄位名稱（自行調整）
+
+    files = [f for f in os.listdir(folder_path) if f.endswith('.csv')]
+
+    for file_name in files:
+        file_path = os.path.join(folder_path, file_name)
+
+        try:
+            # 使用 pandas 讀取固定寬度的檔案
+            df = pd.read_fwf(file_path, widths=widths, header=None)
+            df.columns = columns
+
+            # 添加欄位清理邏輯（如果需要）
+            # 例如：移除空白行、處理遺漏值等
+            df = df.dropna()  # 假設移除有空值的行
+            df["Column1"] = df["Column1"].str.strip()  # 假設移除字串兩端的空白
+
+            # 存檔
+            processed_file_path = os.path.join(folder_path, f"processed_{file_name}")
+            df.to_csv(processed_file_path, index=False)
+            print(f"Processed and saved: {processed_file_path}")
+        except Exception as e:
+            print(f"Error processing file {file_name}: {e}")
+
+if __name__ == "__main__":
+    # 指定資料夾路徑
+    folder_path = "./data_folder"  # 修改為實際的資料夾路徑
+
+    # 加上 .csv 副檔名
+    add_csv_extension(folder_path)
+
+    # 處理檔案並產生適用於 Power BI 的 CSV
+    preprocess_files_for_power_bi(folder_path)
